@@ -5,20 +5,25 @@ import java.util.Optional;
 import com.syspa.login_service.exceptions.InvalidEmailException;
 import com.syspa.login_service.exceptions.InvalidPasswordException;
 import com.syspa.login_service.exceptions.InvalidUsernameException;
+import com.syspa.login_service.exceptions.NonexistentUserException;
 import com.syspa.login_service.model.UserDto;
 import com.syspa.login_service.repository.UserRepository;
+import com.syspa.login_service.utils.JwtUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
 public class UserService implements UserDetailsService {
+
   @Autowired private final UserRepository repository;
+  @Autowired private final PasswordEncoder passwordEncoder;
 
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -31,15 +36,30 @@ public class UserService implements UserDetailsService {
     }
   }
 
-  // --- REPOSITORY METHODS ---
-
   public UserDto save(UserDto user) {
+    user.setPassword(passwordEncoder.encode(user.getPassword()));
     return repository.save(user);
+  }
+
+  public String generateToken(UserDto user) {
+    return JwtUtil.generateToken(user.getUsername());
   }
 
   // --- VALIDATIONS ---
 
   public void validateUser(UserDto user) {
+    Optional<UserDto> foundUser = repository.findByUsername(user.getUsername());
+    if (foundUser.isEmpty()) {
+      throw new NonexistentUserException("Invalid username or password");
+    }
+
+    boolean passwordMatches = passwordEncoder.matches(user.getPassword(), foundUser.get().getPassword());
+    if (!passwordMatches) {
+      throw new NonexistentUserException("Invalid username or password");
+    }
+  }
+
+  public void validateInput(UserDto user) {
     validateUsername(user.getUsername());
     validateEmail(user.getEmail());
     validatePassword(user.getPassword());
