@@ -1,4 +1,4 @@
-package com.syspa.login_service.Model;
+package com.syspa.login_service.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,15 +11,14 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "users")
+@Table(name = "users_auth")
 public class UserDto {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
+
   private String username;
-  private String firstName;
-  private String lastName;
-  private String email;
   private String password;
+  private String role = "USER";
 }

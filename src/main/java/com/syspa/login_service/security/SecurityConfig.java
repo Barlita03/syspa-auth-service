@@ -1,6 +1,6 @@
-package com.syspa.login_service.Security;
+package com.syspa.login_service.security;
 
-import com.syspa.login_service.Model.UserService;
+import com.syspa.login_service.model.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -20,8 +20,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
-  @Autowired
-  private final UserService userService;
+  @Autowired private final UserService userService;
 
   @Bean
   public UserDetailsService userDetailsService() {
@@ -45,18 +44,11 @@ public class SecurityConfig {
   public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
     return httpSecurity
         .csrf(AbstractHttpConfigurer::disable)
-        .formLogin(httpForm -> {
-          httpForm
-              .loginPage("/login")
-              .permitAll();
-          httpForm.defaultSuccessUrl("/home", true);
-        })
-
-        .authorizeHttpRequests(registry -> {
-          registry.requestMatchers("/signup").permitAll();
-          registry.anyRequest().authenticated();
-        })
-
+        .authorizeHttpRequests(
+            registry -> {
+              registry.requestMatchers("auth/V0/signup", "auth/V0/login").permitAll();
+              registry.anyRequest().authenticated();
+            })
         .build();
   }
 }
