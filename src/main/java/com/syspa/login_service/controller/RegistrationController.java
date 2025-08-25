@@ -40,6 +40,6 @@ public class RegistrationController {
     }
 
     String token = service.generateToken(user);
-    return new ResponseEntity<>(token, HttpStatus.CREATED);
+    return new ResponseEntity<>(token, HttpStatus.OK);
   }
 }
