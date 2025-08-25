@@ -40,18 +40,20 @@ User authentication microservice built with Spring Boot. Allows user registratio
 ## Configuration
 
 1. Clone the repository:
-   ```bash
-   git clone https://github.com/Barlita03/syspa-auth-service.git
-   ```
-2. Configure your database in `src/main/resources/application.yml`:
-   ```yml
-   spring:
-     datasource:
-       url: jdbc:postgresql://localhost:5432/login-service
-       username: <your_username>
-       password: <your_password>
-   ```
-   Change the values according to your environment.
+
+```bash
+git clone https://github.com/Barlita03/syspa-auth-service.git
+```
+
+2. Set your database credentials using environment variables in your system or deployment. The application uses the following variables (with defaults):
+
+- `AUTH_DB_HOST` (default: `localhost`)
+- `AUTH_DB_PORT` (default: `5432`)
+- `AUTH_DB_NAME` (default: `login-service`)
+- `AUTH_DB_USERNAME` (default: `postgres`)
+- `AUTH_DB_PASSWORD` (no default, required for production)
+
+You can override these by setting them in your environment before running the application. The `src/main/resources/application.yml` file is already configured to use these variables.
 
 ---
 
