@@ -221,10 +221,6 @@ fetch("/api/protected", {
 
 ---
 
-## Authentication Flow
+## License
 
-1. The user registers via `/auth/{version}/signup`.
-2. The user logs in via `/auth/{version}/login` and receives a JWT.
-3. The JWT is used in the header to access protected resources.
-
----
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
