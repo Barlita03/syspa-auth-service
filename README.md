@@ -1,5 +1,7 @@
 # Syspa Auth Service
 
+**Current API version:** 1.0.0
+
 User authentication microservice built with Spring Boot. Allows user registration and login, returning a **JWT** for authentication in protected endpoints.
 
 ---
@@ -45,7 +47,9 @@ User authentication microservice built with Spring Boot. Allows user registratio
 git clone https://github.com/Barlita03/syspa-auth-service.git
 ```
 
-2. Set your database credentials using environment variables in your system or deployment. The application uses the following variables (with defaults):
+2. **Database configuration:**
+
+By default, the application uses PostgreSQL and expects credentials via environment variables. The `src/main/resources/application.yml` file is set up for this, using:
 
 - `AUTH_DB_HOST` (default: `localhost`)
 - `AUTH_DB_PORT` (default: `5432`)
@@ -53,7 +57,22 @@ git clone https://github.com/Barlita03/syspa-auth-service.git
 - `AUTH_DB_USERNAME` (default: `postgres`)
 - `AUTH_DB_PASSWORD` (no default, required for production)
 
-You can override these by setting them in your environment before running the application. The `src/main/resources/application.yml` file is already configured to use these variables.
+You can override these by setting them in your environment before running the application.
+
+3. **Quickly switch database for local testing:**
+
+If you want to run the service locally without a PostgreSQL instance, you can use the provided alternative config files:
+
+- `src/main/resources/application.hsqldb.yml` — Uses an in-memory HSQLDB database (no setup required)
+- `src/main/resources/application.postgre.yml` — Uses PostgreSQL with environment variables (default)
+
+To use one of these profiles, simply copy the desired file over `application.yml` before starting the app. For example, to use HSQLDB:
+
+```bash
+cp src/main/resources/application.hsqldb.yml src/main/resources/application.yml
+```
+
+This is useful for quick local tests or development without needing to configure a real database. Remember to switch back to the PostgreSQL config (or your own) for production or integration with your real database.
 
 ---
 
@@ -73,9 +92,11 @@ You can override these by setting them in your environment before running the ap
 
 ## API Endpoints
 
+> **Note:** In all endpoint URLs, `{version}` is a placeholder for the current API version (e.g., `V1`, `V2`). Replace `{version}` with the actual version used by your deployment. This makes the documentation version-agnostic and easier to maintain.
+
 ### 1. User Registration (Signup)
 
-**URL:** `/auth/V1/signup`  
+**URL:** `/auth/{version}/signup`  
 **Method:** `POST`  
 **Description:** Registers a new user.
 
@@ -115,7 +136,7 @@ Username is already in use
 
 ### 2. Login
 
-**URL:** `/auth/V1/login`  
+**URL:** `/auth/{version}/login`  
 **Method:** `POST`  
 **Description:** Authenticates a user and returns a JWT.
 
@@ -202,8 +223,8 @@ fetch("/api/protected", {
 
 ## Authentication Flow
 
-1. The user registers via `/auth/V1/signup`.
-2. The user logs in via `/auth/V1/login` and receives a JWT.
+1. The user registers via `/auth/{version}/signup`.
+2. The user logs in via `/auth/{version}/login` and receives a JWT.
 3. The JWT is used in the header to access protected resources.
 
 ---
