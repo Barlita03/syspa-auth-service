@@ -92,7 +92,7 @@ This is useful for quick local tests or development without needing to configure
 
 ## API Endpoints
 
-> **Note:** In all endpoint URLs, `{version}` is a placeholder for the current API version (e.g., `V1`, `V2`). Replace `{version}` with the actual version used by your deployment. This makes the documentation version-agnostic and easier to maintain.
+> **Note:** In all endpoint URLs, `{version}` is a placeholder for the current API version (e.g., `V1`, `V2`). Replace `{version}` with the actual version used by your deployment.
 
 ### 1. User Registration (Signup)
 
