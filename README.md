@@ -253,6 +253,27 @@ This project is configured for production-grade logging using Logback:
 
 ---
 
+## Testing
+
+This project includes unit and integration tests for the main services, controllers, utilities, and repositories.
+
+### How to run the tests?
+
+```bash
+mvn test
+```
+
+This command runs all automated tests using an in-memory H2 database and a special test configuration.
+
+### Testing configuration details
+
+- **Database:** Tests use an in-memory H2 database, so you do not need PostgreSQL or any extra setup.
+- **JWT:** The JWT secret for tests is defined in `src/test/resources/application.yml`.
+- **Security:** Controller tests disable security and CSRF to allow endpoint validation without authentication.
+- **Coverage:** There are tests for `UserService`, `RegistrationController`, `JwtUtil`, and `UserRepository`.
+
+---
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

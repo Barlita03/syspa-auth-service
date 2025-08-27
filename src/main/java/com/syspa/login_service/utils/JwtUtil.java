@@ -12,11 +12,10 @@ import java.security.Key;
 import java.util.Date;
 
 @Component
+
 public class JwtUtil {
-
-
   private final Key secretKey;
-  private final static long EXPIRATION_TIME = 60 * 60 * 1000; // 1 hour in milliseconds
+  private long expirationTime = 60 * 60 * 1000; // 1 hour in milliseconds
 
   public JwtUtil(@Value("${jwt.secret}") String jwtSecret) {
     byte[] keyBytes = jwtSecret.getBytes(StandardCharsets.UTF_8);
@@ -26,11 +25,15 @@ public class JwtUtil {
     this.secretKey = new SecretKeySpec(keyBytes, SignatureAlgorithm.HS256.getJcaName());
   }
 
+  public void setExpirationTime(long expirationTime) {
+    this.expirationTime = expirationTime;
+  }
+
   public String generateToken(String username) {
     return Jwts.builder()
         .setSubject(username)
         .setIssuedAt(new Date())
-        .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+        .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
         .signWith(secretKey, SignatureAlgorithm.HS256)
         .compact();
   }
