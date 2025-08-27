@@ -74,6 +74,16 @@ cp src/main/resources/application.hsqldb.yml src/main/resources/application.yml
 
 This is useful for quick local tests or development without needing to configure a real database. Remember to switch back to the PostgreSQL config (or your own) for production or integration with your real database.
 
+4. **JWT Secret configuration:**
+
+The application requires a secret key for signing JWT tokens. You must set the environment variable `JWT_SECRET` with a value of at least 32 ASCII characters (letters, numbers, and symbols). Example:
+
+```bash
+export JWT_SECRET=mysupersecretkeythatismorethan32byteslong!
+```
+
+If the secret is too short, the application will fail to start for security reasons.
+
 ---
 
 ## Running

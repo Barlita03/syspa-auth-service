@@ -1,3 +1,5 @@
+jwt:
+  secret: ${JWT_SECRET:changeme-in-production}
 server:
   error:
     include-message: always
