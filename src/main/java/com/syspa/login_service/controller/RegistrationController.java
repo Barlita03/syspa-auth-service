@@ -19,26 +19,18 @@ public class RegistrationController {
 
   @Autowired private final UserService service;
 
+
   @PostMapping("signup")
   public ResponseEntity<?> createUser(@RequestBody UserDto user) {
-    try {
-      service.validateInput(user);
-    } catch (Exception e) {
-      return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-    }
-
+    service.validateInput(user);
     UserDto savedUser = service.save(user);
     return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
   }
 
+
   @PostMapping("login")
   public ResponseEntity<?> logUser(@RequestBody UserDto user) {
-    try {
-      service.validateUser(user);
-    } catch (Exception e) {
-      return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-    }
-
+    service.validateUser(user);
     String token = service.generateToken(user);
     return new ResponseEntity<>(token, HttpStatus.OK);
   }

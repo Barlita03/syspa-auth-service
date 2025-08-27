@@ -15,52 +15,46 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(InvalidUsernameException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleInvalidUsername(InvalidUsernameException ex) {
+    public ResponseEntity<Map<String, String>> handleInvalidUsername(InvalidUsernameException ex) {
         Map<String, String> error = new HashMap<>();
         error.put("error", ex.getMessage());
-        return error;
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
     @ExceptionHandler(InvalidPasswordException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleInvalidPassword(InvalidPasswordException ex) {
+    public ResponseEntity<Map<String, String>> handleInvalidPassword(InvalidPasswordException ex) {
         Map<String, String> error = new HashMap<>();
         error.put("error", ex.getMessage());
-        return error;
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
     @ExceptionHandler(InvalidEmailException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleInvalidEmail(InvalidEmailException ex) {
+    public ResponseEntity<Map<String, String>> handleInvalidEmail(InvalidEmailException ex) {
         Map<String, String> error = new HashMap<>();
         error.put("error", ex.getMessage());
-        return error;
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
     @ExceptionHandler(NonexistentUserException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleNonexistentUser(NonexistentUserException ex) {
+    public ResponseEntity<Map<String, String>> handleNonexistentUser(NonexistentUserException ex) {
         Map<String, String> error = new HashMap<>();
         error.put("error", ex.getMessage());
-        return error;
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException ex) {
+    public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getFieldErrors().forEach(error ->
             errors.put(error.getField(), error.getDefaultMessage())
         );
-        return errors;
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
     }
 
     @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public Map<String, String> handleGenericException(Exception ex) {
+    public ResponseEntity<Map<String, String>> handleGenericException(Exception ex) {
         Map<String, String> error = new HashMap<>();
         error.put("error", "Internal server error");
-        return error;
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
 }

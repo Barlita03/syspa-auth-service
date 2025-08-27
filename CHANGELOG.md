@@ -5,6 +5,7 @@
 ### Added
 
 - Production-ready logging: JSON format, daily rotation, 30-day retention, and error log separation.
+- Global exception handler for uniform API error responses. Controller code simplified to leverage centralized error handling.
 
 ## [1.0.1] - 2025-08-26
 
