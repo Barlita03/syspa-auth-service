@@ -231,6 +231,28 @@ fetch("/api/protected", {
 
 ---
 
+## Logging for Production
+
+This project is configured for production-grade logging using Logback:
+
+- Logs are written in JSON format for easy integration with monitoring systems.
+- Log files are rotated daily and kept for 30 days.
+- General logs are saved to `logs/app.log` and errors to `logs/error.log`.
+- You can adjust log levels and retention in `src/main/resources/logback-spring.xml`.
+
+**Requirements:**
+
+- The directory `logs/` must be writable by the application.
+- The dependency `logstash-logback-encoder` is included in `pom.xml`.
+
+**Recommendations:**
+
+- Use `INFO` or `WARN` level in production, and `DEBUG` only for troubleshooting.
+- If running in Docker, consider mapping the `logs/` directory to a persistent volume.
+- For advanced monitoring, forward logs to a centralized system (ELK, Loki, etc.).
+
+---
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
