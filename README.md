@@ -1,6 +1,6 @@
 # Syspa Auth Service
 
-**Current API version:** 1.0.0
+**Current API version:** 1.1.0
 
 User authentication microservice built with Spring Boot. Allows user registration and login, returning a **JWT** for authentication in protected endpoints.
 
