@@ -31,3 +31,31 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Logs
+logs/
+*.log
+
+# Archivos de logs adicionales
+*.log.*
+
+# Archivos de sistema operativo
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+# macOS
+.DS_Store
+
+# Archivos de configuración de entorno
+.env
+*.env
+
+# Archivos de bases de datos temporales
+*.h2.db
+*.mv.db
+*.sqlite
+
+# Archivos de salida de pruebas
+*.out
+*.test
