@@ -1,58 +1,3 @@
-## Metrics (Actuator)
-
-The service also exposes a metrics endpoint for monitoring and observability:
-
-- **URL:** `/actuator/metrics`
-- **Method:** `GET`
-- **Response:**
-  - 200 OK with a list of available metrics (e.g., JVM, memory, CPU, HTTP requests, etc.)
-
-Example:
-
-```json
-{
-  "names": [
-    "jvm.memory.used",
-    "jvm.gc.pause",
-    "http.server.requests",
-    "process.cpu.usage",
-    "system.cpu.usage"
-    // ... more metrics
-  ]
-}
-```
-
-You can query individual metrics by appending the metric name, e.g. `/actuator/metrics/jvm.memory.used`.
-
-This endpoint is enabled by default and does not require authentication. It is useful for Prometheus, Grafana, and other monitoring tools.
-
----
-
-## Health Check (Actuator)
-
-The service exposes a standard health check endpoint for monitoring and orchestration tools:
-
-- **URL:** `/actuator/health`
-- **Method:** `GET`
-- **Response:**
-  - 200 OK with health status and details (e.g., database connection, disk space, etc.)
-
-Example:
-
-```json
-{
-  "status": "UP",
-  "components": {
-    "db": { "status": "UP" },
-    "diskSpace": { "status": "UP" }
-  }
-}
-```
-
-This endpoint is enabled by default and does not require authentication. It is useful for readiness/liveness probes and external monitoring.
-
----
-
 # Syspa Auth Service
 
 **Current API version:** 1.0.0
@@ -326,6 +271,61 @@ This command runs all automated tests using an in-memory H2 database and a speci
 - **JWT:** The JWT secret for tests is defined in `src/test/resources/application.yml`.
 - **Security:** Controller tests disable security and CSRF to allow endpoint validation without authentication.
 - **Coverage:** There are tests for `UserService`, `RegistrationController`, `JwtUtil`, and `UserRepository`.
+
+---
+
+## Metrics (Actuator)
+
+The service also exposes a metrics endpoint for monitoring and observability:
+
+- **URL:** `/actuator/metrics`
+- **Method:** `GET`
+- **Response:**
+  - 200 OK with a list of available metrics (e.g., JVM, memory, CPU, HTTP requests, etc.)
+
+Example:
+
+```json
+{
+  "names": [
+    "jvm.memory.used",
+    "jvm.gc.pause",
+    "http.server.requests",
+    "process.cpu.usage",
+    "system.cpu.usage"
+    // ... more metrics
+  ]
+}
+```
+
+You can query individual metrics by appending the metric name, e.g. `/actuator/metrics/jvm.memory.used`.
+
+This endpoint is enabled by default and does not require authentication. It is useful for Prometheus, Grafana, and other monitoring tools.
+
+---
+
+## Health Check (Actuator)
+
+The service exposes a standard health check endpoint for monitoring and orchestration tools:
+
+- **URL:** `/actuator/health`
+- **Method:** `GET`
+- **Response:**
+  - 200 OK with health status and details (e.g., database connection, disk space, etc.)
+
+Example:
+
+```json
+{
+  "status": "UP",
+  "components": {
+    "db": { "status": "UP" },
+    "diskSpace": { "status": "UP" }
+  }
+}
+```
+
+This endpoint is enabled by default and does not require authentication. It is useful for readiness/liveness probes and external monitoring.
 
 ---
 
