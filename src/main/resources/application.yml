@@ -1,3 +1,11 @@
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
 jwt:
   secret: ${JWT_SECRET:changeme-in-production}
 server:

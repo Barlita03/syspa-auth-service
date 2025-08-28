@@ -48,6 +48,7 @@ public class SecurityConfig {
         .authorizeHttpRequests(
             registry -> {
               registry.requestMatchers("/auth/*/signup", "/auth/*/login").permitAll();
+              registry.requestMatchers("/actuator/health", "/actuator/metrics").permitAll();
               registry.anyRequest().authenticated();
             })
         .build();
