@@ -1,6 +1,10 @@
 package com.syspa.login_service.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.syspa.login_service.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -12,13 +16,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.SecurityFilterChain;
-
 import org.springframework.security.web.AuthenticationEntryPoint;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @AllArgsConstructor
@@ -47,7 +46,7 @@ public class SecurityConfig {
         .csrf(AbstractHttpConfigurer::disable)
         .authorizeHttpRequests(
             registry -> {
-              registry.requestMatchers("/auth/*/signup", "/auth/*/login").permitAll();
+              registry.requestMatchers("/auth/*/signup", "/auth/*/login", "/auth/*/refresh").permitAll();
               registry.requestMatchers("/actuator/health", "/actuator/metrics").permitAll();
               registry.anyRequest().authenticated();
             })
@@ -58,7 +57,11 @@ public class SecurityConfig {
   public AuthenticationEntryPoint customAuthenticationEntryPoint() {
     return new AuthenticationEntryPoint() {
       @Override
-      public void commence(HttpServletRequest request, HttpServletResponse response, org.springframework.security.core.AuthenticationException authException) throws IOException {
+      public void commence(
+          HttpServletRequest request,
+          HttpServletResponse response,
+          org.springframework.security.core.AuthenticationException authException)
+          throws IOException {
         response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         response.setContentType("application/json");
         var error = new java.util.HashMap<String, String>();

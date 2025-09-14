@@ -1,13 +1,12 @@
 package com.syspa.login_service.service;
 
-import java.util.Optional;
-
 import com.syspa.login_service.exceptions.InvalidEmailException;
 import com.syspa.login_service.exceptions.InvalidPasswordException;
 import com.syspa.login_service.exceptions.InvalidUsernameException;
 import com.syspa.login_service.exceptions.NonexistentUserException;
 import com.syspa.login_service.model.UserDto;
 import com.syspa.login_service.repository.UserRepository;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
@@ -17,7 +16,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-
 @Service
 @AllArgsConstructor
 public class UserService implements UserDetailsService {
@@ -25,6 +23,9 @@ public class UserService implements UserDetailsService {
   @Autowired private final UserRepository repository;
   @Autowired private final PasswordEncoder passwordEncoder;
   @Autowired private final com.syspa.login_service.utils.JwtUtil jwtUtil;
+
+  @Autowired(required = false)
+  private RefreshTokenService refreshTokenService;
 
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -54,7 +55,8 @@ public class UserService implements UserDetailsService {
       throw new NonexistentUserException("Invalid username or password");
     }
 
-    boolean passwordMatches = passwordEncoder.matches(user.getPassword(), foundUser.get().getPassword());
+    boolean passwordMatches =
+        passwordEncoder.matches(user.getPassword(), foundUser.get().getPassword());
     if (!passwordMatches) {
       throw new NonexistentUserException("Invalid username or password");
     }

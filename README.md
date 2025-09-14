@@ -148,7 +148,7 @@ Username is already in use
 
 **URL:** `/auth/{version}/login`  
 **Method:** `POST`  
-**Description:** Authenticates a user and returns a JWT.
+**Description:** Authenticates a user and returns an access token (JWT) and a refresh token.
 
 **Example body:**
 
@@ -161,13 +161,16 @@ Username is already in use
 
 **Responses:**
 
-- 200 OK: Returns the JWT token as a string.
+- 200 OK: Returns an object with `accessToken` and `refreshToken`.
 - 400 Bad Request: Returns an error message if authentication fails.
 
 **Example success response:**
 
-```
-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```json
+{
+  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "refreshToken": "dGhpc2lzYXJlZnJlc2h0b2tlbg..."
+}
 ```
 
 **Example error:**
@@ -175,6 +178,48 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 Invalid username or password
 ```
+
+---
+
+### 3. Refresh Token
+
+**URL:** `/auth/{version}/refresh`  
+**Method:** `POST`  
+**Description:** Renews the access token using a valid refresh token. The refresh token is rotated (invalidated and replaced by a new one).
+
+**Example body:**
+
+```json
+{
+  "refreshToken": "dGhpc2lzYXJlZnJlc2h0b2tlbg..."
+}
+```
+
+**Responses:**
+
+- 200 OK: Returns a new `accessToken` and a new `refreshToken`.
+- 401 Unauthorized: If the refresh token is invalid, expired, or already used.
+
+**Example success response:**
+
+```json
+{
+  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "refreshToken": "new_refresh_token..."
+}
+```
+
+**Example error:**
+
+```
+Invalid or expired refresh token
+```
+
+**Security notes:**
+
+- Refresh tokens can only be used once (rotation). If you try to reuse an old one, it will be rejected.
+- If a refresh token is stolen and used, the legitimate user will be forced to re-authenticate.
+- Never share or store refresh tokens insecurely on the frontend.
 
 ---
 

@@ -1,3 +1,12 @@
+# [1.2.0] - 2025-09-14
+
+### Added
+
+- Support for refresh tokens with automatic rotation and invalidation.
+- /auth/V1/refresh endpoint to renew access tokens using refresh tokens.
+- Refresh tokens are invalidated after use (rotation) and can be revoked.
+- Security improvements in the authentication flow.
+
 # Changelog
 
 ## [1.1.0] - 2025-08-27
