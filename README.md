@@ -374,6 +374,16 @@ This endpoint is enabled by default and does not require authentication. It is u
 
 ---
 
+## HTTP Security Headers
+
+This service applies the following HTTP security headers to all responses:
+
+- **X-Content-Type-Options: nosniff** — Prevents browsers from MIME-sniffing a response away from the declared content-type.
+- **X-Frame-Options: DENY** — Prevents the site from being embedded in an iframe, protecting against clickjacking.
+- **Content-Security-Policy: default-src 'none';** — Blocks all resource loading by default. Adjust as needed if serving UI or static content.
+- **Referrer-Policy: no-referrer** — No referrer information is sent with requests.
+- **Strict-Transport-Security** — Enforced only when running behind HTTPS. Forces browsers to use HTTPS for all future requests.
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

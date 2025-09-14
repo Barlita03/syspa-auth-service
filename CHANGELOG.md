@@ -7,6 +7,7 @@
 - Refresh tokens are invalidated after use (rotation) and can be revoked.
 - Security improvements in the authentication flow.
 - Input validation using standard Bean Validation annotations (`@NotBlank`, `@Size`, `@Email`, etc.) in models and controllers. Invalid requests now return detailed error messages per field.
+- HTTP security headers added: X-Content-Type-Options, X-Frame-Options, Content-Security-Policy, Referrer-Policy, and Strict-Transport-Security (when using HTTPS). These headers help protect against XSS, clickjacking, and information leakage.
 
 # Changelog
 
