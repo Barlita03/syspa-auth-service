@@ -3,9 +3,10 @@
 ### Added
 
 - Support for refresh tokens with automatic rotation and invalidation.
-- /auth/V1/refresh endpoint to renew access tokens using refresh tokens.
+- `/auth/V1/refresh` endpoint to renew access tokens using refresh tokens.
 - Refresh tokens are invalidated after use (rotation) and can be revoked.
 - Security improvements in the authentication flow.
+- Input validation using standard Bean Validation annotations (`@NotBlank`, `@Size`, `@Email`, etc.) in models and controllers. Invalid requests now return detailed error messages per field.
 
 # Changelog
 

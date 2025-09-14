@@ -8,7 +8,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
-import org.antlr.v4.runtime.misc.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Email;
 
 @Getter
 @Setter
@@ -20,14 +22,20 @@ public class UserDto {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
 
-  @NotNull
+
+  @NotBlank(message = "Username is required")
+  @Size(min = 5, message = "Username must be at least 5 characters long")
   @Column(nullable = false)
   private String username;
 
-  @NotNull
+
+  @NotBlank(message = "Password is required")
+  @Size(min = 8, message = "Password must be at least 8 characters long")
   @Column(nullable = false)
   private String password;
 
+  @NotBlank(message = "Email is required")
+  @Email(message = "Email must be valid")
   private String email;
   private String role = "USER";
 }
