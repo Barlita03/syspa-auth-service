@@ -2,6 +2,14 @@
 
 ## [1.3.0] - 2025-09-15
 
+### Added
+
+- Real role-based access control (RBAC) with USER/ADMIN roles, enforced via JWT and Spring Security.
+- Endpoints can be protected by role using `@PreAuthorize`. Example: `/admin/hello` (ADMIN only), `/user/hello` (USER only).
+- JWT now includes the user's role as a claim, always reflecting the value in the database.
+- If a user tries to access an endpoint without the required role, the API returns HTTP 403 with a clear error message.
+- Documentation updated with RBAC usage and error examples.
+
 ### Changed
 
 - User and RefreshToken entities now use UUID as the primary key instead of Long. All related repositories, services, and API responses updated accordingly.

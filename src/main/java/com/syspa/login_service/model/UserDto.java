@@ -1,5 +1,6 @@
 package com.syspa.login_service.model;
 
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,12 +13,19 @@ import lombok.Setter;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.Email;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "users_auth")
+
 public class UserDto {
+
+  public enum Role {
+    USER, ADMIN
+  }
 
   @Id
   @GeneratedValue(generator = "UUID")
@@ -40,5 +48,7 @@ public class UserDto {
   @NotBlank(message = "Email is required")
   @Email(message = "Email must be valid")
   private String email;
-  private String role = "USER";
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private Role role = Role.USER;
 }

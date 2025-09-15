@@ -231,6 +231,29 @@ Invalid or expired refresh token
 
 ---
 
+## Role-based Access Control (RBAC)
+
+This service implements real role-based access control using JWT and Spring Security. There are two roles: `USER` and `ADMIN`.
+
+- The user's role is stored in the database and included in the JWT as a claim.
+- Endpoints can be protected using `@PreAuthorize("hasRole('ADMIN')")` or `@PreAuthorize("hasRole('USER')")`.
+- Example endpoints:
+  - `/admin/hello` — Only accessible by users with the `ADMIN` role.
+  - `/user/hello` — Only accessible by users with the `USER` role.
+
+If a user tries to access an endpoint without the required role, the API returns:
+
+```
+HTTP/1.1 403 Forbidden
+{
+  "error": "Access denied: you do not have permission to perform this action."
+}
+```
+
+The role is assigned at registration (default: USER) or can be set to ADMIN in the database. The login process always issues a JWT with the correct role from the database.
+
+---
+
 ## User Model
 
 ```json

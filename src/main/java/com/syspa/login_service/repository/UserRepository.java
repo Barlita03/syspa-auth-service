@@ -1,3 +1,4 @@
+
 package com.syspa.login_service.repository;
 
 
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 public interface UserRepository extends JpaRepository<UserDto, UUID> {
   Optional<UserDto> findByUsername(String username);
-
   Optional<UserDto> findByEmail(String email);
+  boolean existsByEmail(String email);
+  boolean existsByUsername(String username);
 }

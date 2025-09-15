@@ -1,5 +1,6 @@
 package com.syspa.login_service.security;
 
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,14 +12,12 @@ import com.syspa.login_service.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,17 +26,20 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
-  @Autowired private final UserService service;
-  @Autowired private final PasswordEncoder passwordEncoder;
-  
+  private final UserService service;
+  private final PasswordEncoder passwordEncoder;
+  private final JwtAuthFilter jwtAuthFilter;
+
   @Value("${ALLOWED_ORIGINS:*}")
   private String allowedOrigins;
 
-  public SecurityConfig(UserService service, PasswordEncoder passwordEncoder) {
+  public SecurityConfig(UserService service, PasswordEncoder passwordEncoder, JwtAuthFilter jwtAuthFilter) {
     this.service = service;
     this.passwordEncoder = passwordEncoder;
+    this.jwtAuthFilter = jwtAuthFilter;
   }
 
   @Bean
@@ -75,6 +77,7 @@ public class SecurityConfig {
         registry.requestMatchers("/actuator/health", "/actuator/metrics").permitAll();
         registry.anyRequest().authenticated();
       })
+    .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
     .build();
   }
 

@@ -50,11 +50,13 @@ public class RegistrationController {
     if (!recaptchaService.verify(request.getRecaptchaToken())) {
       return new ResponseEntity<>("Invalid reCAPTCHA", HttpStatus.BAD_REQUEST);
     }
-    service.validateUser(request.getUser());
-    String accessToken = service.generateToken(request.getUser());
-    RefreshToken refreshToken = refreshTokenService.createRefreshToken(request.getUser().getUsername());
-    return new ResponseEntity<>(
-        new AuthResponse(accessToken, refreshToken.getToken()), HttpStatus.OK);
+  service.validateUser(request.getUser());
+  // Recuperar el usuario real de la base para obtener el rol correcto
+  UserDto dbUser = service.getByUsername(request.getUser().getUsername());
+  String accessToken = service.generateToken(dbUser);
+  RefreshToken refreshToken = refreshTokenService.createRefreshToken(dbUser.getUsername());
+  return new ResponseEntity<>(
+    new AuthResponse(accessToken, refreshToken.getToken()), HttpStatus.OK);
   }
 
   @PostMapping("refresh")

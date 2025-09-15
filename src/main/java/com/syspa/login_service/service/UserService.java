@@ -10,29 +10,34 @@ import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+
 @Service
 @AllArgsConstructor
 public class UserService implements UserDetailsService {
 
-  @Autowired private final UserRepository repository;
-  @Autowired private final PasswordEncoder passwordEncoder;
-  @Autowired private final com.syspa.login_service.utils.JwtUtil jwtUtil;
-
-  @Autowired(required = false)
-  private RefreshTokenService refreshTokenService;
+  private final UserRepository repository;
+  private final PasswordEncoder passwordEncoder;
+  private final com.syspa.login_service.utils.JwtUtil jwtUtil;
 
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
     Optional<UserDto> user = repository.findByUsername(username);
     if (user.isPresent()) {
       var userObj = user.get();
-      return User.builder().username(userObj.getUsername()).password(userObj.getPassword()).build();
+      GrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + userObj.getRole().name());
+      return User.builder()
+          .username(userObj.getUsername())
+          .password(userObj.getPassword())
+          .authorities(authority)
+          .build();
     } else {
       throw new UsernameNotFoundException("User not found");
     }
@@ -44,7 +49,7 @@ public class UserService implements UserDetailsService {
   }
 
   public String generateToken(UserDto user) {
-    return jwtUtil.generateToken(user.getUsername());
+    return jwtUtil.generateToken(user.getUsername(), user.getRole().name());
   }
 
   // --- VALIDATIONS ---
@@ -90,16 +95,19 @@ public class UserService implements UserDetailsService {
   }
 
   private void availableEmail(String email) {
-    Optional<UserDto> user = repository.findByEmail(email);
-    if (user.isPresent()) {
+    if (repository.existsByEmail(email)) {
       throw new InvalidEmailException("The email is already in use");
     }
   }
 
   private void availableUsername(String username) {
-    Optional<UserDto> user = repository.findByUsername(username);
-    if (user.isPresent()) {
+    if (repository.existsByUsername(username)) {
       throw new InvalidUsernameException("The username is already in use");
     }
+  }
+
+  public UserDto getByUsername(String username) {
+    return repository.findByUsername(username)
+        .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
   }
 }
