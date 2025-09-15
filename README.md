@@ -384,6 +384,29 @@ This service applies the following HTTP security headers to all responses:
 - **Referrer-Policy: no-referrer** — No referrer information is sent with requests.
 - **Strict-Transport-Security** — Enforced only when running behind HTTPS. Forces browsers to use HTTPS for all future requests.
 
+---
+
+## Rate Limiting (Brute-force Protection)
+
+This service implements rate limiting on sensitive endpoints (`/login` and `/signup`) to protect against brute-force attacks and abuse.
+
+- Each IP address is allowed up to **5 requests per minute** to these endpoints.
+- If the limit is exceeded, the server responds with HTTP 429 (Too Many Requests).
+- After 1 minute, the quota is reset and requests are allowed again.
+
+This is implemented using [Bucket4j](https://github.com/bucket4j/bucket4j), a Java rate-limiting library. You can adjust the rate and scope in the `RateLimitingFilter` class.
+
+**Example error response:**
+
+```
+HTTP/1.1 429 Too Many Requests
+Content-Type: text/plain
+
+Too Many Requests
+```
+
+---
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
