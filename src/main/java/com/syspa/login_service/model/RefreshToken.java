@@ -11,8 +11,10 @@ import lombok.Setter;
 @Table(name = "refresh_tokens")
 public class RefreshToken {
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long id;
+  @GeneratedValue(generator = "UUID")
+  @org.hibernate.annotations.GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+  @Column(name = "id", updatable = false, nullable = false, columnDefinition = "uuid")
+  private java.util.UUID id;
 
   @Column(nullable = false)
   private String token;

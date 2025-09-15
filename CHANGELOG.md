@@ -1,4 +1,13 @@
-# [1.2.0] - 2025-09-14
+# Changelog
+
+## [1.3.0] - 2025-09-15
+
+### Changed
+
+- User and RefreshToken entities now use UUID as the primary key instead of Long. All related repositories, services, and API responses updated accordingly.
+- Updated API documentation and examples to reflect UUID usage for IDs.
+
+## [1.2.0] - 2025-09-14
 
 ### Added
 
@@ -14,8 +23,6 @@
 - If the token is missing or invalid, the API returns HTTP 400 with a clear error message.
 - Uses Google test keys by default for local/dev testing (any token accepted). In production, set the RECAPTCHA_SECRET environment variable.
 - Updated API documentation and request examples to reflect the new required structure.
-
-# Changelog
 
 ## [1.1.0] - 2025-08-27
 

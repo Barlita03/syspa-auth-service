@@ -235,7 +235,7 @@ Invalid or expired refresh token
 
 ```json
 {
-  "id": 1,
+  "id": "b3b1c2d4-5e6f-7a8b-9c0d-1e2f3a4b5c6d",
   "username": "johndoe",
   "password": "<encrypted>",
   "email": "johndoe@example.com",
