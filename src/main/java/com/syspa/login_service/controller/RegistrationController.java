@@ -1,11 +1,14 @@
 package com.syspa.login_service.controller;
 
 import com.syspa.login_service.model.AuthResponse;
+import com.syspa.login_service.model.LoginRequest;
 import com.syspa.login_service.model.RefreshToken;
 import com.syspa.login_service.model.RefreshRequest;
+import com.syspa.login_service.model.SignupRequest;
 import com.syspa.login_service.model.UserDto;
 import com.syspa.login_service.service.RefreshTokenService;
 import com.syspa.login_service.service.UserService;
+import com.syspa.login_service.security.RecaptchaService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,19 +25,34 @@ public class RegistrationController {
 
   @Autowired private final UserService service;
   @Autowired private final RefreshTokenService refreshTokenService;
+  @Autowired private final RecaptchaService recaptchaService;
+
 
   @PostMapping("signup")
-  public ResponseEntity<?> createUser(@RequestBody UserDto user) {
-    service.validateInput(user);
-    UserDto savedUser = service.save(user);
+  public ResponseEntity<?> createUser(@RequestBody SignupRequest request) {
+    if (request.getRecaptchaToken() == null || request.getRecaptchaToken().isBlank()) {
+      return new ResponseEntity<>("Missing reCAPTCHA token", HttpStatus.BAD_REQUEST);
+    }
+    if (!recaptchaService.verify(request.getRecaptchaToken())) {
+      return new ResponseEntity<>("Invalid reCAPTCHA", HttpStatus.BAD_REQUEST);
+    }
+    service.validateInput(request.getUser());
+    UserDto savedUser = service.save(request.getUser());
     return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
   }
 
+
   @PostMapping("login")
-  public ResponseEntity<?> logUser(@RequestBody UserDto user) {
-    service.validateUser(user);
-    String accessToken = service.generateToken(user);
-    RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getUsername());
+  public ResponseEntity<?> logUser(@RequestBody LoginRequest request) {
+    if (request.getRecaptchaToken() == null || request.getRecaptchaToken().isBlank()) {
+      return new ResponseEntity<>("Missing reCAPTCHA token", HttpStatus.BAD_REQUEST);
+    }
+    if (!recaptchaService.verify(request.getRecaptchaToken())) {
+      return new ResponseEntity<>("Invalid reCAPTCHA", HttpStatus.BAD_REQUEST);
+    }
+    service.validateUser(request.getUser());
+    String accessToken = service.generateToken(request.getUser());
+    RefreshToken refreshToken = refreshTokenService.createRefreshToken(request.getUser().getUsername());
     return new ResponseEntity<>(
         new AuthResponse(accessToken, refreshToken.getToken()), HttpStatus.OK);
   }

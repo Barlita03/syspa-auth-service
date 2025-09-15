@@ -10,6 +10,10 @@
 - HTTP security headers added: X-Content-Type-Options, X-Frame-Options, Content-Security-Policy, Referrer-Policy, and Strict-Transport-Security (when using HTTPS). These headers help protect against XSS, clickjacking, and information leakage.
 - Rate limiting (Bucket4j) on /login and /signup endpoints: max 5 requests per minute per IP. Exceeding the limit returns HTTP 429. Helps prevent brute-force attacks.
 - Configurable CORS: allow all origins by default, or restrict using the ALLOWED_ORIGINS environment variable. Supports comma-separated list for multiple domains. Documented in README.
+- Google reCAPTCHA v2 integration: login and signup endpoints now require a valid reCAPTCHA token in the request body (`recaptchaToken`).
+- If the token is missing or invalid, the API returns HTTP 400 with a clear error message.
+- Uses Google test keys by default for local/dev testing (any token accepted). In production, set the RECAPTCHA_SECRET environment variable.
+- Updated API documentation and request examples to reflect the new required structure.
 
 # Changelog
 

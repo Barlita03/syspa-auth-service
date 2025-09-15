@@ -57,6 +57,7 @@ By default, the application uses PostgreSQL and expects credentials via environm
 - `AUTH_DB_USERNAME` (default: `postgres`)
 - `AUTH_DB_PASSWORD` (no default, required for production)
 - `ALLOWED_ORIGINS` (default: `*`)
+- `RECAPTCHA_SECRET` (default: Google test key)
 
 You can override these by setting them in your environment before running the application.
 
@@ -115,9 +116,12 @@ If the secret is too short, the application will fail to start for security reas
 
 ```json
 {
-  "username": "johndoe",
-  "password": "password123",
-  "email": "johndoe@example.com"
+  "user": {
+    "username": "johndoe",
+    "password": "password123",
+    "email": "johndoe@example.com"
+  },
+  "recaptchaToken": "<token-from-frontend>"
 }
 ```
 
@@ -155,8 +159,11 @@ Username is already in use
 
 ```json
 {
-  "username": "johndoe",
-  "password": "password123"
+  "user": {
+    "username": "johndoe",
+    "password": "password123"
+  },
+  "recaptchaToken": "<token-from-frontend>"
 }
 ```
 
@@ -426,6 +433,41 @@ This service supports secure and flexible CORS configuration to control which fr
 - You can always change this variable at deployment time without code changes.
 
 This is implemented via a global CORS filter in `SecurityConfig`.
+
+---
+
+## CAPTCHA (Bot Protection)
+
+This service requires a valid Google reCAPTCHA token for login and signup endpoints to prevent automated abuse and bots.
+
+- The frontend must obtain a reCAPTCHA token (v2) and send it in the `recaptchaToken` field of the request body.
+- The backend validates the token with Google before processing authentication or registration.
+- If the token is missing or invalid, the server responds with HTTP 400 and a clear error message.
+
+**Environment variable:**
+
+- `RECAPTCHA_SECRET` — Your Google reCAPTCHA secret key. If not set, a public test key is used for development (`6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe`).
+
+**Testing locally:**
+
+- You can use the official Google test keys:
+  - Site key: `6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI`
+  - Secret key: `6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe`
+- With these, any token or string will be accepted as valid for local/dev testing.
+
+**Example error responses:**
+
+```
+HTTP/1.1 400 Bad Request
+Missing reCAPTCHA token
+```
+
+or
+
+```
+HTTP/1.1 400 Bad Request
+Invalid reCAPTCHA
+```
 
 ---
 
