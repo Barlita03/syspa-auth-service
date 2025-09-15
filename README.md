@@ -56,6 +56,7 @@ By default, the application uses PostgreSQL and expects credentials via environm
 - `AUTH_DB_NAME` (default: `login-service`)
 - `AUTH_DB_USERNAME` (default: `postgres`)
 - `AUTH_DB_PASSWORD` (no default, required for production)
+- `ALLOWED_ORIGINS` (default: `*`)
 
 You can override these by setting them in your environment before running the application.
 
@@ -404,6 +405,27 @@ Content-Type: text/plain
 
 Too Many Requests
 ```
+
+---
+
+## CORS (Cross-Origin Resource Sharing)
+
+This service supports secure and flexible CORS configuration to control which frontends or domains can access the API from browsers.
+
+- By default, all origins are allowed (open for development and open source use).
+- You can restrict allowed origins by setting the `ALLOWED_ORIGINS` environment variable (comma-separated list).
+- Example (Linux/macOS):
+  ```bash
+  export ALLOWED_ORIGINS=https://my-frontend.com,https://admin.my-frontend.com
+  ```
+- Example (Windows):
+  ```powershell
+  $env:ALLOWED_ORIGINS="https://my-frontend.com,https://admin.my-frontend.com"
+  ```
+- If set, only those origins will be able to make CORS requests to the API.
+- You can always change this variable at deployment time without code changes.
+
+This is implemented via a global CORS filter in `SecurityConfig`.
 
 ---
 

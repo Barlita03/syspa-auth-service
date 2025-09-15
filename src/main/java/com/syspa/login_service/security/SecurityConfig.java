@@ -1,5 +1,9 @@
 package com.syspa.login_service.security;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.syspa.login_service.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,12 +24,19 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
-@AllArgsConstructor
 @EnableWebSecurity
 public class SecurityConfig {
 
   @Autowired private final UserService service;
   @Autowired private final PasswordEncoder passwordEncoder;
+  
+  @Value("${ALLOWED_ORIGINS:*}")
+  private String allowedOrigins;
+
+  public SecurityConfig(UserService service, PasswordEncoder passwordEncoder) {
+    this.service = service;
+    this.passwordEncoder = passwordEncoder;
+  }
 
   @Bean
   public UserDetailsService userDetailsService() {
@@ -81,5 +92,23 @@ public class SecurityConfig {
         new ObjectMapper().writeValue(response.getOutputStream(), error);
       }
     };
+  }
+
+  @Bean
+  public CorsFilter corsFilter() {
+    CorsConfiguration config = new CorsConfiguration();
+    if ("*".equals(allowedOrigins)) {
+      config.addAllowedOriginPattern("*");
+    } else {
+      for (String origin : allowedOrigins.split(",")) {
+        config.addAllowedOrigin(origin.trim());
+      }
+    }
+    config.addAllowedHeader("*");
+    config.addAllowedMethod("*");
+    config.setAllowCredentials(true);
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", config);
+    return new CorsFilter(source);
   }
 }
