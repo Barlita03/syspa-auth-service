@@ -2,9 +2,12 @@
 
 ## [1.4.0] - 2025-09-15
 
+### Added
+
 - Exposed standard well-known endpoints:
   - `/.well-known/jwks.json`: Publishes the RSA public key in JWKS format for external JWT validation. Key values (`n`, `e`) are configured via environment variables (`JWT_RSA_MODULUS`, `JWT_RSA_EXPONENT`).
   - `/.well-known/openid-configuration`: Publishes basic OIDC configuration (issuer, endpoints, algorithms, JWKS URI, etc).
+- New endpoint `/auth/V1/logout`: Revokes the refresh token and logs out the user. The refresh token is invalidated in the backend and cannot be reused. The event is recorded in the audit log. The access token (JWT) must be deleted on the frontend.
 
 ## [1.3.0] - 2025-09-15
 

@@ -219,6 +219,83 @@ Invalid username or password
 
 **URL:** `/auth/{version}/refresh`  
 **Method:** `POST`  
+**Description:** Renueva el access token usando un refresh token válido. El refresh token se rota (se invalida y se reemplaza por uno nuevo).
+
+**Example body:**
+
+```json
+{
+  "refreshToken": "dGhpc2lzYXJlZnJlc2h0b2tlbg..."
+}
+```
+
+**Responses:**
+
+- 200 OK: Devuelve un nuevo `accessToken` y un nuevo `refreshToken`.
+- 401 Unauthorized: Si el refresh token es inválido, expirado o ya fue usado.
+
+**Example success response:**
+
+```json
+{
+  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "refreshToken": "new_refresh_token..."
+}
+```
+
+**Example error:**
+
+```
+Invalid or expired refresh token
+```
+
+**Security notes:**
+
+- Los refresh tokens solo pueden usarse una vez (rotación). Si intentas reutilizar uno viejo, será rechazado.
+- Si un refresh token es robado y usado, el usuario legítimo deberá autenticarse nuevamente.
+- Nunca compartas ni almacenes refresh tokens de forma insegura en el frontend.
+
+---
+
+### 4. Logout
+
+**URL:** `/auth/{version}/logout`  
+**Method:** `POST`  
+**Description:** Revoca el refresh token y cierra la sesión del usuario. El access token debe eliminarse en el frontend.
+
+**Example body:**
+
+```json
+{
+  "refreshToken": "dGhpc2lzYXJlZnJlc2h0b2tlbg..."
+}
+```
+
+**Responses:**
+
+- 200 OK: Logout exitoso, tokens revocados.
+- 400 Bad Request: El refresh token no existe.
+
+**Example success response:**
+
+```
+Logout successful: tokens revoked
+```
+
+**Example error:**
+
+```
+Refresh token not found
+```
+
+**Security notes:**
+
+- El refresh token se revoca en el backend y no puede volver a usarse.
+- El access token (JWT) no se puede revocar en el backend; debe eliminarse en el frontend.
+- El evento de logout queda registrado en el log de auditoría.
+
+**URL:** `/auth/{version}/refresh`  
+**Method:** `POST`  
 **Description:** Renews the access token using a valid refresh token. The refresh token is rotated (invalidated and replaced by a new one).
 
 **Example body:**

@@ -24,6 +24,20 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 @RequestMapping("/auth/V1/")
 public class RegistrationController {
+  @PostMapping("logout")
+  public ResponseEntity<?> logout(@RequestBody RefreshRequest request) {
+    String refreshTokenValue = request.getRefreshToken();
+    var tokenOpt = refreshTokenService.findByToken(refreshTokenValue);
+    if (tokenOpt.isEmpty()) {
+      auditLogger.warn("event=LOGOUT_FAILED, reason=refresh_token_not_found, token={}", refreshTokenValue);
+      return new ResponseEntity<>("Refresh token not found", HttpStatus.BAD_REQUEST);
+    }
+    RefreshToken token = tokenOpt.get();
+    refreshTokenService.revokeToken(token);
+    auditLogger.info("event=USER_LOGOUT, username={}, token={}", token.getUsername(), token.getToken());
+    // El access token no se puede revocar en backend (JWT stateless), pero se recomienda al frontend eliminarlo.
+    return new ResponseEntity<>("Logout successful: tokens revoked", HttpStatus.OK);
+  }
 
   @Autowired private final UserService service;
   @Autowired private final RefreshTokenService refreshTokenService;
