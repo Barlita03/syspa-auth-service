@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/admin")
 public class AdminController {
-    @GetMapping("/hello")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> helloAdmin() {
-        return ResponseEntity.ok("Hello, ADMIN!");
-    }
+  @GetMapping("/hello")
+  @PreAuthorize("hasRole('ADMIN')")
+  public ResponseEntity<String> helloAdmin() {
+    return ResponseEntity.ok("Hello, ADMIN!");
+  }
 }

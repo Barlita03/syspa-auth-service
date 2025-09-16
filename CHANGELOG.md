@@ -2,6 +2,8 @@
 
 ## [1.3.0] - 2025-09-15
 
+### Changed
+
 ### Added
 
 - Real role-based access control (RBAC) with USER/ADMIN roles, enforced via JWT and Spring Security.
@@ -12,11 +14,17 @@
 - Advanced auditing: dedicated logger for security events (user registration, login, refresh token rotation, invalid refresh token attempts), configured in `logback-spring.xml` and writing to `logs/audit.log` in JSON format with daily rotation and 90-day retention.
 - Audited events include relevant details (username, email, role, user ID, involved tokens).
 - Documentation updated with examples of audited events and audit logger configuration.
+- Optional and configurable validation of `aud` (audience) and `iss` (issuer) claims in JWT. If not set, they are not included or validated, allowing open source and flexible usage.
+- Temporary account lockout after multiple failed login attempts (5 attempts, 5 minutes lockout).
+- Automatic scheduled purge of expired refresh tokens.
+- Integration of the Spotless plugin for automatic Java code formatting (Google Java Format).
 
 ### Changed
 
 - User and RefreshToken entities now use UUID as the primary key instead of Long. All related repositories, services, and API responses updated accordingly.
 - Updated API documentation and examples to reflect UUID usage for IDs.
+- The microservice is now fully usable by any user or ecosystem, with no forced JWT claim restrictions.
+- Minor improvements in documentation and code robustness.
 
 ## [1.2.0] - 2025-09-14
 

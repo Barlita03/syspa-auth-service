@@ -1,6 +1,5 @@
 package com.syspa.login_service.service;
 
-import org.springframework.transaction.annotation.Transactional;
 import com.syspa.login_service.model.RefreshToken;
 import com.syspa.login_service.repository.RefreshTokenRepository;
 import java.security.SecureRandom;
@@ -9,7 +8,9 @@ import java.util.Base64;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
@@ -41,6 +42,13 @@ public class RefreshTokenService {
   public void revokeToken(RefreshToken token) {
     token.setRevoked(true);
     refreshTokenRepository.save(token);
+  }
+
+  // Purga automática de tokens vencidos cada hora
+  @Scheduled(cron = "0 0 * * * *")
+  @Transactional
+  public void purgeExpiredTokens() {
+    refreshTokenRepository.deleteAllByExpiryDateBefore(Instant.now());
   }
 
   private String generateRandomToken() {

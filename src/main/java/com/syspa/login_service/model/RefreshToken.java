@@ -12,7 +12,9 @@ import lombok.Setter;
 public class RefreshToken {
   @Id
   @GeneratedValue(generator = "UUID")
-  @org.hibernate.annotations.GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+  @org.hibernate.annotations.GenericGenerator(
+      name = "UUID",
+      strategy = "org.hibernate.id.UUIDGenerator")
   @Column(name = "id", updatable = false, nullable = false, columnDefinition = "uuid")
   private java.util.UUID id;
 

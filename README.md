@@ -13,10 +13,22 @@ User authentication microservice built with Spring Boot. Allows user registratio
 - [Configuration](#configuration)
 - [Running](#running)
 - [API Endpoints](#api-endpoints)
+- [Role-based Access Control (RBAC)](#role-based-access-control-rbac)
 - [User Model](#user-model)
 - [Validations](#validations)
 - [Common Errors](#common-errors)
 - [JWT Usage](#jwt-usage)
+- [Logging for Production](#logging-for-production)
+- [Testing](#testing)
+- [Metrics (Actuator)](#metrics-actuator)
+- [Health Check (Actuator)](#health-check-actuator)
+- [HTTP Security Headers](#http-security-headers)
+- [Rate Limiting (Brute-force Protection)](#rate-limiting-brute-force-protection)
+- [CORS (Cross-Origin Resource Sharing)](#cors-cross-origin-resource-sharing)
+- [CAPTCHA (Bot Protection)](#captcha-bot-protection)
+- [Advanced Auditing & Monitoring](#advanced-auditing--monitoring)
+- [Security & Compliance](#security--compliance)
+- [License](#license)
 
 ---
 
@@ -56,8 +68,6 @@ By default, the application uses PostgreSQL and expects credentials via environm
 - `AUTH_DB_NAME` (default: `login-service`)
 - `AUTH_DB_USERNAME` (default: `postgres`)
 - `AUTH_DB_PASSWORD` (no default, required for production)
-- `ALLOWED_ORIGINS` (default: `*`)
-- `RECAPTCHA_SECRET` (default: Google test key)
 
 You can override these by setting them in your environment before running the application.
 
@@ -85,6 +95,19 @@ export JWT_SECRET=mysupersecretkeythatismorethan32byteslong!
 ```
 
 If the secret is too short, the application will fail to start for security reasons.
+
+export JWT_SECRET=mysupersecretkeythatismorethan32byteslong!
+export JWT_EXPECTEDAUDIENCE=my-app
+export JWT_EXPECTEDISSUER=my-auth-service
+
+5. **Other environment variables:**
+- `ALLOWED_ORIGINS` (default: `*`): allowed CORS origins (comma-separated list).
+- `RECAPTCHA_SECRET` (default: Google test key): Google reCAPTCHA secret key.
+- `JWT_SECRET` (required, min 32 chars): secret key for signing JWT tokens.
+- `JWT_EXPECTEDAUDIENCE` (optional): expected value for the `aud` (audience) claim in JWTs. If not set, the claim is not included or validated.
+- `JWT_EXPECTEDISSUER` (optional): expected value for the `iss` (issuer) claim in JWTs. If not set, the claim is not included or validated.
+
+If you do not set `JWT_EXPECTEDAUDIENCE` or `JWT_EXPECTEDISSUER`, the tokens will be valid for any audience/issuer, making the service open and flexible for any integration.
 
 ---
 
@@ -517,6 +540,29 @@ Example of an audited event:
   "role": "USER"
 }
 ```
+
+---
+
+## Security & Compliance
+
+### Incident Response Playbook
+- **Credential/Token Compromise:**
+  - Immediately rotate all affected credentials and JWT secrets.
+  - Mass invalidate all active tokens (access and refresh) for affected users.
+  - Notify users and log all actions in the audit log.
+  - Review logs for suspicious activity and escalate if needed.
+- **Detection:**
+  - Alerts are triggered on excessive failed logins, brute-force attempts, and suspicious refresh token usage.
+- **Recovery:**
+  - RPO/RTO defined for authentication service. Health checks and readiness endpoints available.
+
+### Backup & Restore Policy
+- **Database Backups:**
+  - Automated daily backups of the identity database (users, tokens).
+  - Backups are encrypted at rest and stored securely.
+  - Restoration procedures are tested regularly.
+- **Retention:**
+  - Expired tokens and auxiliary data are purged automatically (see scheduled job in RefreshTokenService).
 
 ---
 
