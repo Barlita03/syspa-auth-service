@@ -1,16 +1,17 @@
 package com.syspa.login_service.service;
 
-import java.util.Optional;
-
 import com.syspa.login_service.exceptions.InvalidEmailException;
 import com.syspa.login_service.exceptions.InvalidPasswordException;
 import com.syspa.login_service.exceptions.InvalidUsernameException;
 import com.syspa.login_service.exceptions.NonexistentUserException;
 import com.syspa.login_service.model.UserDto;
 import com.syspa.login_service.repository.UserRepository;
-import com.syspa.login_service.utils.JwtUtil;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -22,15 +23,21 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class UserService implements UserDetailsService {
 
-  @Autowired private final UserRepository repository;
-  @Autowired private final PasswordEncoder passwordEncoder;
+  private final UserRepository repository;
+  private final PasswordEncoder passwordEncoder;
+  private final com.syspa.login_service.utils.JwtUtil jwtUtil;
 
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
     Optional<UserDto> user = repository.findByUsername(username);
     if (user.isPresent()) {
       var userObj = user.get();
-      return User.builder().username(userObj.getUsername()).password(userObj.getPassword()).build();
+      GrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + userObj.getRole().name());
+      return User.builder()
+          .username(userObj.getUsername())
+          .password(userObj.getPassword())
+          .authorities(authority)
+          .build();
     } else {
       throw new UsernameNotFoundException("User not found");
     }
@@ -42,30 +49,10 @@ public class UserService implements UserDetailsService {
   }
 
   public String generateToken(UserDto user) {
-    return JwtUtil.generateToken(user.getUsername());
+    return jwtUtil.generateToken(user.getUsername(), user.getRole().name());
   }
 
   // --- VALIDATIONS ---
-
-  public void validateUser(UserDto user) {
-    Optional<UserDto> foundUser = repository.findByUsername(user.getUsername());
-    if (foundUser.isEmpty()) {
-      throw new NonexistentUserException("Invalid username or password");
-    }
-
-    boolean passwordMatches = passwordEncoder.matches(user.getPassword(), foundUser.get().getPassword());
-    if (!passwordMatches) {
-      throw new NonexistentUserException("Invalid username or password");
-    }
-  }
-
-  public void validateInput(UserDto user) {
-    validateUsername(user.getUsername());
-    validateEmail(user.getEmail());
-    validatePassword(user.getPassword());
-    availableUsername(user.getUsername());
-    availableEmail(user.getEmail());
-  }
 
   private void validatePassword(String password) {
     if (password.length() < 8) {
@@ -87,16 +74,72 @@ public class UserService implements UserDetailsService {
   }
 
   private void availableEmail(String email) {
-    Optional<UserDto> user = repository.findByEmail(email);
-    if (user.isPresent()) {
+    if (repository.existsByEmail(email)) {
       throw new InvalidEmailException("The email is already in use");
     }
   }
 
   private void availableUsername(String username) {
-    Optional<UserDto> user = repository.findByUsername(username);
-    if (user.isPresent()) {
+    if (repository.existsByUsername(username)) {
       throw new InvalidUsernameException("The username is already in use");
     }
+  }
+
+  // --- BLOQUEO TEMPORAL ---
+  private final Map<String, Integer> failedAttempts = new ConcurrentHashMap<>();
+  private final Map<String, Long> blockedUntil = new ConcurrentHashMap<>();
+  private static final int MAX_ATTEMPTS = 5;
+  private static final long BLOCK_DURATION_MS = 5 * 60 * 1000; // 5 minutos
+
+  public boolean isBlocked(String username) {
+    Long until = blockedUntil.get(username);
+    return until != null && until > System.currentTimeMillis();
+  }
+
+  public void registerFailedAttempt(String username) {
+    int attempts = failedAttempts.getOrDefault(username, 0) + 1;
+    failedAttempts.put(username, attempts);
+    if (attempts >= MAX_ATTEMPTS) {
+      blockedUntil.put(username, System.currentTimeMillis() + BLOCK_DURATION_MS);
+      failedAttempts.put(username, 0);
+    }
+  }
+
+  public void resetAttempts(String username) {
+    failedAttempts.remove(username);
+    blockedUntil.remove(username);
+  }
+
+  public void validateUser(UserDto user) {
+    if (isBlocked(user.getUsername())) {
+      throw new NonexistentUserException(
+          "Account temporarily blocked due to multiple failed login attempts");
+    }
+    Optional<UserDto> foundUser = repository.findByUsername(user.getUsername());
+    if (foundUser.isEmpty()) {
+      registerFailedAttempt(user.getUsername());
+      throw new NonexistentUserException("Invalid username or password");
+    }
+    boolean passwordMatches =
+        passwordEncoder.matches(user.getPassword(), foundUser.get().getPassword());
+    if (!passwordMatches) {
+      registerFailedAttempt(user.getUsername());
+      throw new NonexistentUserException("Invalid username or password");
+    }
+    resetAttempts(user.getUsername());
+  }
+
+  public UserDto getByUsername(String username) {
+    return repository
+        .findByUsername(username)
+        .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+  }
+
+  public void validateInput(UserDto user) {
+    validateUsername(user.getUsername());
+    validateEmail(user.getEmail());
+    validatePassword(user.getPassword());
+    availableUsername(user.getUsername());
+    availableEmail(user.getEmail());
   }
 }
