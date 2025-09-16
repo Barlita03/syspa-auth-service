@@ -9,6 +9,9 @@
 - JWT now includes the user's role as a claim, always reflecting the value in the database.
 - If a user tries to access an endpoint without the required role, the API returns HTTP 403 with a clear error message.
 - Documentation updated with RBAC usage and error examples.
+- Advanced auditing: dedicated logger for security events (user registration, login, refresh token rotation, invalid refresh token attempts), configured in `logback-spring.xml` and writing to `logs/audit.log` in JSON format with daily rotation and 90-day retention.
+- Audited events include relevant details (username, email, role, user ID, involved tokens).
+- Documentation updated with examples of audited events and audit logger configuration.
 
 ### Changed
 

@@ -35,4 +35,20 @@
     <logger name="ERROR_LOGGER" level="ERROR" additivity="false">
         <appender-ref ref="ERROR_JSON_FILE"/>
     </logger>
+
+    <!-- Appender para auditoría en JSON -->
+    <appender name="AUDIT_JSON_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/audit.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/audit.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>90</maxHistory>
+            <totalSizeCap>2GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+    </appender>
+
+    <!-- Logger dedicado para auditoría -->
+    <logger name="AUDIT_LOGGER" level="INFO" additivity="false">
+        <appender-ref ref="AUDIT_JSON_FILE"/>
+    </logger>
 </configuration>

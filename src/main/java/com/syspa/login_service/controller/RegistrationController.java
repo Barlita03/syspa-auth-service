@@ -1,5 +1,7 @@
 package com.syspa.login_service.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.syspa.login_service.model.AuthResponse;
 import com.syspa.login_service.model.LoginRequest;
 import com.syspa.login_service.model.RefreshToken;
@@ -38,6 +40,7 @@ public class RegistrationController {
     }
     service.validateInput(request.getUser());
     UserDto savedUser = service.save(request.getUser());
+      auditLogger.info("event=USER_REGISTERED, username={}, email={}, id={}", savedUser.getUsername(), savedUser.getEmail(), savedUser.getId());
     return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
   }
 
@@ -55,6 +58,7 @@ public class RegistrationController {
   UserDto dbUser = service.getByUsername(request.getUser().getUsername());
   String accessToken = service.generateToken(dbUser);
   RefreshToken refreshToken = refreshTokenService.createRefreshToken(dbUser.getUsername());
+    auditLogger.info("event=USER_LOGIN, username={}, id={}, role={}", dbUser.getUsername(), dbUser.getId(), dbUser.getRole());
   return new ResponseEntity<>(
     new AuthResponse(accessToken, refreshToken.getToken()), HttpStatus.OK);
   }
@@ -64,6 +68,7 @@ public class RegistrationController {
     String refreshTokenValue = request.getRefreshToken();
     var tokenOpt = refreshTokenService.findByToken(refreshTokenValue);
     if (tokenOpt.isEmpty() || !refreshTokenService.isValid(tokenOpt.get())) {
+        auditLogger.warn("event=REFRESH_TOKEN_INVALID, token={}", refreshTokenValue);
       return new ResponseEntity<>("Invalid or expired refresh token", HttpStatus.UNAUTHORIZED);
     }
     RefreshToken oldToken = tokenOpt.get();
@@ -73,7 +78,11 @@ public class RegistrationController {
         service.generateToken(
             new UserDto() {{ setUsername(username); }});
     RefreshToken newRefreshToken = refreshTokenService.createRefreshToken(username);
+      auditLogger.info("event=REFRESH_TOKEN_ROTATED, username={}, oldToken={}, newToken={}", username, oldToken.getToken(), newRefreshToken.getToken());
     return new ResponseEntity<>(
         new AuthResponse(newAccessToken, newRefreshToken.getToken()), HttpStatus.OK);
   }
+
+  // Logger dedicado para auditoría
+  private static final Logger auditLogger = LoggerFactory.getLogger("AUDIT_LOGGER");
 }

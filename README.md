@@ -494,6 +494,32 @@ Invalid reCAPTCHA
 
 ---
 
+# Advanced Auditing & Monitoring
+
+The system implements a dedicated audit logger for security-related events, configured in `logback-spring.xml` and writing to `logs/audit.log` in JSON format. Audited events include:
+
+- User registration
+- User login
+- Refresh token rotation and usage
+- Invalid refresh token attempts
+
+Each event includes relevant details such as username, email, role, user ID, and involved tokens. The audit log file is rotated daily and retained for 90 days.
+
+Example of an audited event:
+
+```json
+{
+  "timestamp": "2025-09-15T12:34:56.789Z",
+  "level": "INFO",
+  "event": "USER_LOGIN",
+  "username": "johnsmith",
+  "id": "b1c2d3e4-...",
+  "role": "USER"
+}
+```
+
+---
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
