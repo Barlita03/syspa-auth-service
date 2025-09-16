@@ -76,7 +76,7 @@ public class SecurityConfig {
     .authorizeHttpRequests(
       registry -> {
         registry
-          .requestMatchers("/auth/*/signup", "/auth/*/login", "/auth/*/refresh", "/auth/*/logout")
+          .requestMatchers("/auth/*/signup", "/auth/*/login", "/auth/*/refresh", "/auth/*/logout", "/auth/*/reset-password", "/auth/*/forgot-password")
           .permitAll();
         registry.requestMatchers("/actuator/health", "/actuator/metrics").permitAll();
         registry.requestMatchers("/.well-known/jwks.json", "/.well-known/openid-configuration").permitAll();

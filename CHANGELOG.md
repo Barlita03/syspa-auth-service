@@ -8,6 +8,11 @@
   - `/.well-known/jwks.json`: Publishes the RSA public key in JWKS format for external JWT validation. Key values (`n`, `e`) are configured via environment variables (`JWT_RSA_MODULUS`, `JWT_RSA_EXPONENT`).
   - `/.well-known/openid-configuration`: Publishes basic OIDC configuration (issuer, endpoints, algorithms, JWKS URI, etc).
 - New endpoint `/auth/V1/logout`: Revokes the refresh token and logs out the user. The refresh token is invalidated in the backend and cannot be reused. The event is recorded in the audit log. The access token (JWT) must be deleted on the frontend.
+- SMTP configuration is now fully flexible: host and port are set via environment variables (`MAIL_HOST`, `MAIL_PORT`). Users can use Gmail, Mailtrap, SendGrid, etc. without code changes. Documented in README.
+- Added password recovery flow:
+  - Endpoint `/auth/V1/forgot-password` to request password reset. Sends email with single-use token (valid for 15 minutes).
+  - Endpoint `/auth/V1/reset-password` to change password using the token. Token expires after use or 15 minutes.
+  - All events are logged in the audit log.
 
 ## [1.3.0] - 2025-09-15
 

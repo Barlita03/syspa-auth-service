@@ -109,6 +109,10 @@ export JWT_EXPECTEDISSUER=my-auth-service
 - `JWT_EXPECTEDISSUER` (optional): expected value for the `iss` (issuer) claim in JWTs. If not set, the claim is not included or validated.
 - `JWT_RSA_MODULUS`: Base64URL encoded modulus. **Obligatoria si se expone /.well-known/jwks.json**. Representa la clave pública RSA utilizada para firmar los JWT. Debe ser el valor de la clave pública en formato Base64URL.
 - `JWT_RSA_EXPONENT`: Base64URL encoded exponent (usualmente `AQAB`). **Obligatoria si se expone /.well-known/jwks.json**. Representa el exponente público RSA utilizado para la verificación de los JWT. Normalmente es `AQAB` (65537 en decimal).
+- `MAIL_HOST` (default: `smtp.gmail.com`): SMTP server host. Set to your provider (Mailtrap, Gmail, SendGrid, etc).
+- `MAIL_PORT` (default: `587`): SMTP server port.
+- `MAIL_USERNAME`: SMTP username (required).
+- `MAIL_PASSWORD`: SMTP password (required).
 
 If you do not set `JWT_EXPECTEDAUDIENCE` or `JWT_EXPECTEDISSUER`, the tokens will be valid for any audience/issuer, making the service open and flexible for any integration.
 
@@ -331,6 +335,70 @@ Invalid or expired refresh token
 - Refresh tokens can only be used once (rotation). If you try to reuse an old one, it will be rejected.
 - If a refresh token is stolen and used, the legitimate user will be forced to re-authenticate.
 - Never share or store refresh tokens insecurely on the frontend.
+
+---
+
+### 5. Password Recovery
+
+**URL:** `/auth/{version}/forgot-password`  
+**Method:** `POST`  
+**Description:** Solicita la recuperación de contraseña. Envía un email con un token de un solo uso y expiración corta (15 minutos).
+
+**Example body:**
+
+```json
+{
+  "username": "johndoe"
+}
+```
+
+**Responses:**
+
+- 200 OK: Email enviado con el token de recuperación.
+- 404 Not Found: Usuario no encontrado.
+
+**Example success response:**
+
+```
+Recovery email sent
+```
+
+---
+
+**URL:** `/auth/{version}/reset-password`  
+**Method:** `POST`  
+**Description:** Cambia la contraseña usando el token recibido por email. El token solo puede usarse una vez y expira en 15 minutos.
+
+**Example body:**
+
+```json
+{
+  "token": "token_de_recuperacion",
+  "newPassword": "nuevaPasswordSegura123"
+}
+```
+
+**Responses:**
+
+- 200 OK: Contraseña cambiada exitosamente.
+- 400 Bad Request: Token inválido, expirado o ya usado.
+
+**Example success response:**
+
+```
+Password reset successful
+```
+
+**Example error:**
+
+```
+Invalid or expired token
+```
+
+**Security notes:**
+
+- El token de recuperación expira en 15 minutos y solo puede usarse una vez.
+- El evento queda registrado en el log de auditoría.
 
 ---
 
