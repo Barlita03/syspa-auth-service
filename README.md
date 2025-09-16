@@ -101,11 +101,14 @@ export JWT_EXPECTEDAUDIENCE=my-app
 export JWT_EXPECTEDISSUER=my-auth-service
 
 5. **Other environment variables:**
+
 - `ALLOWED_ORIGINS` (default: `*`): allowed CORS origins (comma-separated list).
 - `RECAPTCHA_SECRET` (default: Google test key): Google reCAPTCHA secret key.
 - `JWT_SECRET` (required, min 32 chars): secret key for signing JWT tokens.
 - `JWT_EXPECTEDAUDIENCE` (optional): expected value for the `aud` (audience) claim in JWTs. If not set, the claim is not included or validated.
 - `JWT_EXPECTEDISSUER` (optional): expected value for the `iss` (issuer) claim in JWTs. If not set, the claim is not included or validated.
+- `JWT_RSA_MODULUS`: Base64URL encoded modulus. **Obligatoria si se expone /.well-known/jwks.json**. Representa la clave pública RSA utilizada para firmar los JWT. Debe ser el valor de la clave pública en formato Base64URL.
+- `JWT_RSA_EXPONENT`: Base64URL encoded exponent (usualmente `AQAB`). **Obligatoria si se expone /.well-known/jwks.json**. Representa el exponente público RSA utilizado para la verificación de los JWT. Normalmente es `AQAB` (65537 en decimal).
 
 If you do not set `JWT_EXPECTEDAUDIENCE` or `JWT_EXPECTEDISSUER`, the tokens will be valid for any audience/issuer, making the service open and flexible for any integration.
 
@@ -546,6 +549,7 @@ Example of an audited event:
 ## Security & Compliance
 
 ### Incident Response Playbook
+
 - **Credential/Token Compromise:**
   - Immediately rotate all affected credentials and JWT secrets.
   - Mass invalidate all active tokens (access and refresh) for affected users.
@@ -557,12 +561,28 @@ Example of an audited event:
   - RPO/RTO defined for authentication service. Health checks and readiness endpoints available.
 
 ### Backup & Restore Policy
+
 - **Database Backups:**
   - Automated daily backups of the identity database (users, tokens).
   - Backups are encrypted at rest and stored securely.
   - Restoration procedures are tested regularly.
 - **Retention:**
   - Expired tokens and auxiliary data are purged automatically (see scheduled job in RefreshTokenService).
+
+---
+
+## Well-Known Endpoints for JWT/OIDC
+
+The service exposes standard endpoints for JWT/OIDC integration:
+
+- `/.well-known/jwks.json`: Publishes the RSA public key in JWKS format for external JWT validation. The key values (`n` for modulus, `e` for exponent) are configured via environment variables:
+
+  - `JWT_RSA_MODULUS`: Base64URL encoded modulus
+  - `JWT_RSA_EXPONENT`: Base64URL encoded exponent (usually `AQAB`)
+
+- `/.well-known/openid-configuration`: Publishes basic OIDC configuration (issuer, endpoints, algorithms, JWKS URI, etc).
+
+This allows external systems to validate tokens and discover your authentication configuration securely and automatically. No code changes are needed for production—just set the environment variables.
 
 ---
 

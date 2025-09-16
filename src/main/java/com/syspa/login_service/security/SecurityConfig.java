@@ -58,31 +58,32 @@ public class SecurityConfig {
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-    return httpSecurity
-        .csrf(AbstractHttpConfigurer::disable)
-        .headers(
-            headers -> {
-              headers.httpStrictTransportSecurity(
-                  hsts -> hsts.includeSubDomains(true).maxAgeInSeconds(31536000));
-              headers.contentTypeOptions();
-              headers.frameOptions(frame -> frame.deny());
-              headers.referrerPolicy(
-                  referrer ->
-                      referrer.policy(
-                          org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter
-                              .ReferrerPolicy.NO_REFERRER));
-              headers.contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'none';"));
-            })
-        .authorizeHttpRequests(
-            registry -> {
-              registry
-                  .requestMatchers("/auth/*/signup", "/auth/*/login", "/auth/*/refresh")
-                  .permitAll();
-              registry.requestMatchers("/actuator/health", "/actuator/metrics").permitAll();
-              registry.anyRequest().authenticated();
-            })
-        .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-        .build();
+  return httpSecurity
+    .csrf(AbstractHttpConfigurer::disable)
+    .headers(
+      headers -> {
+        headers.httpStrictTransportSecurity(
+          hsts -> hsts.includeSubDomains(true).maxAgeInSeconds(31536000));
+        headers.contentTypeOptions();
+        headers.frameOptions(frame -> frame.deny());
+        headers.referrerPolicy(
+          referrer ->
+            referrer.policy(
+              org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter
+                .ReferrerPolicy.NO_REFERRER));
+        headers.contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'none';"));
+      })
+    .authorizeHttpRequests(
+      registry -> {
+        registry
+          .requestMatchers("/auth/*/signup", "/auth/*/login", "/auth/*/refresh")
+          .permitAll();
+        registry.requestMatchers("/actuator/health", "/actuator/metrics").permitAll();
+        registry.requestMatchers("/.well-known/jwks.json", "/.well-known/openid-configuration").permitAll();
+        registry.anyRequest().authenticated();
+      })
+    .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+    .build();
   }
 
   @Bean
